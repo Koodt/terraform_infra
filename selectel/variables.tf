@@ -12,3 +12,8 @@ variable "user_pass" {
   description = "Terraform access user password"
   default     = ""
 }
+
+variable "project_name" {
+  description = "Terraform project name"
+  default     = ""
+}
