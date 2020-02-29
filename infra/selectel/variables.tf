@@ -22,19 +22,3 @@ variable "os_domain_name" {
   description = "Selectel domain name"
   default     = ""
 }
-variable "os_region" {
-  description = "Selectel project region"
-  default     = ""
-}
-variable "ssh_key" {
-  description = "Access SSH key"
-  default     = ""
-}
-variable "isolate_network_name" {
-  description = "Isolate private network name"
-  default     = "isolate_private_network"
-}
-variable "isolate_network_CIDR" {
-  description = "Isolate private network CIDR"
-  default     = "192.168.0.0/24"
-}

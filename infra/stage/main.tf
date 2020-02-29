@@ -8,13 +8,12 @@ provider "openstack" {
   region              = var.os_region
 }
 
-module "project" {
-  source = "../../modules/project"
+module "keypair" {
+  source = "../../modules/keypair"
 
-  api_token = var.api_token
-  project_name = var.os_project_name
-  user_name    = var.os_user_name
-  user_pass    = var.os_user_password
+  project_name  = var.os_project_name
+  region        = var.os_region
+  ssh_key       = var.ssh_key
 }
 
 module "network_private_isolate_1" {
@@ -22,4 +21,36 @@ module "network_private_isolate_1" {
 
   network_name = var.isolate_network_name
   network_CIDR = var.isolate_network_CIDR
+}
+
+module "vm_onelan_remotedisk" {
+  source = "../../modules/instance"
+
+  fqdn      = "my.server.hostname"
+  hostname  = "instance"
+  server_az = "ru-3a"
+  volume_type = "fast"
+  volume_size = "30"
+  flavor_id = "1014"
+  key_pair  = module.keypair.ssh_key_id
+  image_id  = "5842d2ca-8c3d-40b7-8017-5cfad4e23736"
+
+  first_ip                = "192.168.0.100"
+  first_network_id        = module.network_private_isolate_1.returned_first_network_id
+  first_network_subnet_id = module.network_private_isolate_1.returned_first_network_subnet_id
+}
+
+module "vm_onelan_localdisk" {
+  source = "../../modules/instance"
+
+  fqdn      = "my.server.hostname"
+  hostname  = "instance"
+  server_az = "ru-3a"
+  flavor_id = "1314"
+  key_pair  = module.keypair.ssh_key_id
+  image_id  = "5842d2ca-8c3d-40b7-8017-5cfad4e23736"
+
+  first_ip                = "192.168.0.110"
+  first_network_id        = module.network_private_isolate_1.returned_first_network_id
+  first_network_subnet_id = module.network_private_isolate_1.returned_first_network_subnet_id
 }
