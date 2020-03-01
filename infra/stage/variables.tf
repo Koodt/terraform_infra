@@ -38,3 +38,7 @@ variable "isolate_network_CIDR" {
   description = "Isolate private network CIDR"
   default     = "192.168.0.0/24"
 }
+variable "api_node_numbers" {
+  description = "Count of api nodes"
+  default     = 3
+}

@@ -1,16 +1,17 @@
 variable "hostname" {}
-variable "fqdn" {}
 variable "key_pair" {}
 variable "volume_type" {
   default = ""
 }
 variable "server_az" {}
 variable "volume_size" {
-  default = ""
+  default = 0
 }
 variable "flavor_id" {}
-variable "image_id" {}
-variable "first_ip" {}
+variable "image" {
+  default = "Ubuntu 18.04 LTS 64-bit"
+}
+variable "first_ip_subnet" {}
 variable "first_network_id" {}
 variable "first_network_subnet_id" {}
 variable "second_ip" {
@@ -22,3 +23,7 @@ variable "second_network_id" {
 variable "second_network_subnet_id" {
   default = ""
 }
+variable "instance_numbers" {
+  default = 1
+}
+variable "name" {}
