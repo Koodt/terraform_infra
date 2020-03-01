@@ -34,13 +34,14 @@ module "api_node_remote_disk_two_lan" {
   source            = "../../modules/instance"
   instance_numbers  = var.api_node_remote_disk_two_lan_numbers
 
-  name        = "api"
-  hostname    = "instance"
-  server_az   = "ru-3a"
-  volume_type = "fast"
-  volume_size = 30
-  flavor_id   = "1014"
-  key_pair    = module.keypair.ssh_key_id
+  name              = "api"
+  hostname          = "instance"
+  server_az         = "ru-3a"
+  volume_type       = "fast"
+  volume_size       = 30
+  flavor_id         = "1014"
+  key_pair          = module.keypair.ssh_key_id
+  use_anti_affinity = true
 
   first_network_name        = var.isolate_network_name
   first_ip_subnet           = var.isolate_network_CIDR
@@ -77,11 +78,12 @@ module "api_node_local_disk_one_lan" {
   source            = "../../modules/instance"
   instance_numbers  = var.api_node_remote_disk_one_lan_numbers
 
-  name        = "api"
-  hostname    = "instance"
-  server_az   = "ru-3a"
-  flavor_id   = "1314"
-  key_pair    = module.keypair.ssh_key_id
+  name              = "api"
+  hostname          = "instance"
+  server_az         = "ru-3a"
+  flavor_id         = "1314"
+  key_pair          = module.keypair.ssh_key_id
+  use_anti_affinity = true
 
   first_network_name        = var.isolate_network_name
   first_ip_subnet           = var.isolate_network_CIDR

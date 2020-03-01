@@ -36,5 +36,5 @@ variable "second_start_ip" {
   default = ""
 }
 variable "use_anti_affinity" {
-  default = "true"
+  default = false
 }
