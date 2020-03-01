@@ -14,7 +14,8 @@ variable "image" {
 variable "first_ip_subnet" {}
 variable "first_network_id" {}
 variable "first_network_subnet_id" {}
-variable "second_ip" {
+variable "first_network_name" {}
+variable "second_ip_subnet" {
   default = ""
 }
 variable "second_network_id" {
@@ -23,7 +24,17 @@ variable "second_network_id" {
 variable "second_network_subnet_id" {
   default = ""
 }
+variable "second_network_name" {
+    default = ""
+}
 variable "instance_numbers" {
   default = 1
 }
 variable "name" {}
+variable "first_start_ip" {}
+variable "second_start_ip" {
+  default = ""
+}
+variable "use_anti_affinity" {
+  default = "true"
+}

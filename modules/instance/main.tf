@@ -1,42 +1,33 @@
 data "openstack_images_image_v2" "vm_image" {
-  name = "${var.image}"
+  name = var.image
 }
 
-resource "openstack_networking_port_v2" "first_port" {
-  count         = var.instance_numbers
-  name          = "port_${var.hostname}_${count.index}"
-  network_id    = var.first_network_id
-  fixed_ip {
-    ip_address  = "${var.first_ip_subnet}${count.index+10}"
-    subnet_id   = var.first_network_subnet_id
-  }
-}
-
-resource "openstack_networking_port_v2" "second_port" {
-  count = var.second_ip != "" ? 1 : 0
-  name          = "port_${var.hostname}_2"
-  network_id    = var.second_network_id
-  fixed_ip {
-    ip_address  = var.second_ip
-    subnet_id   = var.second_network_subnet_id
-  }
+resource "openstack_compute_servergroup_v2" "api_nodes" {
+  count = "%{ if var.use_anti_affinity }1%{else}0%{endif}"
+  name = "api-nodes-group"
+  policies = ["anti-affinity"]
 }
 
 resource "openstack_compute_instance_v2" "server" {
-  name              = "${var.name}${count.index+1}"
+  name              = "${var.name}${count.index + 1}"
   count             = var.instance_numbers
   flavor_id         = var.flavor_id
   key_pair          = var.key_pair
   availability_zone = var.server_az
+  image_id          = data.openstack_images_image_v2.vm_image.id
 
   network {
-    port = openstack_networking_port_v2.first_port[count.index].id
+    uuid        = var.first_network_id
+    name        = var.first_network_name
+    fixed_ip_v4 = "${var.first_ip_subnet}${count.index + var.first_start_ip}"
   }
 
   dynamic "network" {
-    for_each = openstack_networking_port_v2.second_port
+    for_each = var.second_ip_subnet != "" ? [var.second_network_id] : []
     content {
-      port = network.value["id"]
+      uuid        = var.second_network_id
+      name        = var.second_network_name
+      fixed_ip_v4 = "${var.second_ip_subnet}${count.index + var.second_start_ip}"
     }
   }
 
@@ -48,6 +39,14 @@ resource "openstack_compute_instance_v2" "server" {
       destination_type  = "volume"
       boot_index        = 0
       volume_size       = var.volume_size
+      delete_on_termination = true
+    }
+  }
+
+  dynamic "scheduler_hints" {
+    for_each = var.use_anti_affinity ? [openstack_compute_servergroup_v2.api_nodes[0]] : []
+    content {
+      group = openstack_compute_servergroup_v2.api_nodes[0].id
     }
   }
 

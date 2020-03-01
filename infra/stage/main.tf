@@ -20,12 +20,19 @@ module "network_private_isolate_1" {
   source = "../../modules/network"
 
   network_name = var.isolate_network_name
-  network_CIDR = var.isolate_network_CIDR
+  network_CIDR = "${var.isolate_network_CIDR}0/24"
 }
 
-module "api_node" {
+module "network_private_1" {
+  source = "../../modules/network"
+
+  network_name = var.private_network_name
+  network_CIDR = "${var.private_network_CIDR}0/24"
+}
+
+module "api_node_remote_disk_two_lan" {
   source            = "../../modules/instance"
-  instance_numbers  = var.api_node_numbers
+  instance_numbers  = var.api_node_remote_disk_two_lan_numbers
 
   name        = "api"
   hostname    = "instance"
@@ -35,22 +42,72 @@ module "api_node" {
   flavor_id   = "1014"
   key_pair    = module.keypair.ssh_key_id
 
-  first_ip_subnet                = "192.168.0."
-  first_network_id        = module.network_private_isolate_1.returned_first_network_id
-  first_network_subnet_id = module.network_private_isolate_1.returned_first_network_subnet_id
+  first_network_name        = var.isolate_network_name
+  first_ip_subnet           = var.isolate_network_CIDR
+  first_start_ip            = "10"
+  first_network_id          = module.network_private_isolate_1.returned_network_id
+  first_network_subnet_id   = module.network_private_isolate_1.returned_network_subnet_id
+  second_network_name       = var.private_network_name
+  second_ip_subnet          = var.private_network_CIDR
+  second_start_ip           = "23"
+  second_network_id         = module.network_private_1.returned_network_id
+  second_network_subnet_id  = module.network_private_1.returned_network_subnet_id
 }
 
-# module "vm_onelan_localdisk" {
-#   source = "../../modules/instance"
+module "api_node_remote_disk_one_lan" {
+  source            = "../../modules/instance"
+  instance_numbers  = var.api_node_remote_disk_one_lan_numbers
 
-#   fqdn      = "my.server.hostname"
-#   hostname  = "instance"
-#   server_az = "ru-3a"
-#   flavor_id = "1314"
-#   key_pair  = module.keypair.ssh_key_id
-#   image_id  = "5842d2ca-8c3d-40b7-8017-5cfad4e23736"
+  name        = "srv"
+  hostname    = "instance"
+  server_az   = "ru-3a"
+  volume_type = "fast"
+  volume_size = 30
+  flavor_id   = "1014"
+  key_pair    = module.keypair.ssh_key_id
 
-#   first_ip                = "192.168.0.110"
-#   first_network_id        = module.network_private_isolate_1.returned_first_network_id
-#   first_network_subnet_id = module.network_private_isolate_1.returned_first_network_subnet_id
-# }
+  first_network_name        = var.isolate_network_name
+  first_ip_subnet           = var.isolate_network_CIDR
+  first_start_ip            = "52"
+  first_network_id          = module.network_private_isolate_1.returned_network_id
+  first_network_subnet_id   = module.network_private_isolate_1.returned_network_subnet_id
+}
+
+module "api_node_local_disk_one_lan" {
+  source            = "../../modules/instance"
+  instance_numbers  = var.api_node_remote_disk_one_lan_numbers
+
+  name        = "api"
+  hostname    = "instance"
+  server_az   = "ru-3a"
+  flavor_id   = "1314"
+  key_pair    = module.keypair.ssh_key_id
+
+  first_network_name        = var.isolate_network_name
+  first_ip_subnet           = var.isolate_network_CIDR
+  first_start_ip            = "3"
+  first_network_id          = module.network_private_isolate_1.returned_network_id
+  first_network_subnet_id   = module.network_private_isolate_1.returned_network_subnet_id
+}
+
+module "api_node_local_disk_two_lan" {
+  source            = "../../modules/instance"
+  instance_numbers  = var.api_node_remote_disk_one_lan_numbers
+
+  name        = "net"
+  hostname    = "instance"
+  server_az   = "ru-3a"
+  flavor_id   = "1314"
+  key_pair    = module.keypair.ssh_key_id
+
+  first_network_name        = var.isolate_network_name
+  first_ip_subnet           = var.isolate_network_CIDR
+  first_start_ip            = "15"
+  first_network_id          = module.network_private_isolate_1.returned_network_id
+  first_network_subnet_id   = module.network_private_isolate_1.returned_network_subnet_id
+  second_network_name       = var.private_network_name
+  second_ip_subnet          = var.private_network_CIDR
+  second_start_ip           = "15"
+  second_network_id         = module.network_private_1.returned_network_id
+  second_network_subnet_id  = module.network_private_1.returned_network_subnet_id
+}

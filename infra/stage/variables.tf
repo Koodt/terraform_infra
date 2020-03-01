@@ -36,9 +36,21 @@ variable "isolate_network_name" {
 }
 variable "isolate_network_CIDR" {
   description = "Isolate private network CIDR"
-  default     = "192.168.0.0/24"
+  default     = "192.168.0."
 }
-variable "api_node_numbers" {
-  description = "Count of api nodes"
-  default     = 3
+variable "private_network_name" {
+  description = "Private network name"
+  default     = "private_network"
+}
+variable "private_network_CIDR" {
+  description = "Private network CIDR"
+  default     = "10.10.0."
+}
+variable "api_node_remote_disk_two_lan_numbers" {
+  description = "Count of instances"
+  default     = 2
+}
+variable "api_node_remote_disk_one_lan_numbers" {
+  description = "Count of instances"
+  default     = 1
 }
